@@ -51,17 +51,35 @@ int main(int argc, char const *argv[])
                 elf.calories = 0;
             }
         }
+        elves.push_back(elf);
         file.close();
 
-        Elf maxelf;
+        Elf maxelf[3];
         for(auto x : elves)
         {
-            if(x.calories >= maxelf.calories)
+            if(x.calories >= maxelf[0].calories)
             {
-                maxelf = x;
+                maxelf[2] = maxelf[1];
+                maxelf[1] = maxelf[0];
+                maxelf[0] = x;
+            }
+            else if(x.calories >= maxelf[1].calories)
+            {
+                maxelf[2] = maxelf[1];
+                maxelf[1] = x;
+            }
+            else if(x.calories >= maxelf[2].calories)
+            {
+                maxelf[2] = x;
             }
         }
-        std::cout << maxelf.index << '|' << maxelf.calories;
+        int sum = 0;
+        for(auto x : maxelf)
+        {
+            std::cout << x.index << "|" << x.calories << '\n';
+            sum += x.calories;
+        }
+        std::cout << sum;
     }
     return 0;
 }
