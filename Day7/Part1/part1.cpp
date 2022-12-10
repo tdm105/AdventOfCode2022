@@ -32,13 +32,12 @@ public:
 
 class Directory
 {
-private:
+public:
     Directory* parent = nullptr;
     int size = 0;
     std::string name;
     std::vector<File> files;
     std::vector<Directory> dirs;
-public:
     Directory(/* args */) = default;
     Directory(Directory* parent, const std::string name)
     :parent(parent),name(name)
@@ -103,6 +102,21 @@ std::vector<std::string> split(const std::string str, const std::string& sep)
     return arr;
 }
 
+int findAtMostTenThousand(const Directory& dir)
+{
+    int sum = 0;
+    if(dir.size <= 100000)
+    {
+        std::cout << dir.name << ": " << dir.size << "\n";
+        sum += dir.size;
+    }
+    for(auto x : dir.dirs)
+    {
+        sum += findAtMostTenThousand(x);
+    }
+    return sum;
+}
+
 int main(int argc, char const *argv[])
 {
     if(argc != 2)
@@ -148,8 +162,8 @@ int main(int argc, char const *argv[])
                         {
                             if(cmd[2] == fsptr->getDirectories()[i].getName())
                             {
-                                Directory* parnt = fsptr->getDirectories()[i].getParent();
-                                fsptr = &fsptr->getDirectories()[i];
+                                Directory* parnt = fsptr;
+                                fsptr = &fsptr->dirs[i];
                                 fsptr->setParent(parnt);
                                 break;
                             }
@@ -162,21 +176,23 @@ int main(int argc, char const *argv[])
                     {
                         if(cmd[0] == "dir")
                         {
-                            fsptr->addDirectory(Directory(fsptr,cmd[1]));
+                            Directory tmp(fsptr,cmd[1]);
+                            fsptr->addDirectory(tmp);
                         }
                         else
                         {
-                            File* tmp = new File;
-                            tmp->setName(cmd[1]);
-                            tmp->setSize(std::stoi(cmd[0]));
-                            *fsptr += *tmp;
-                            delete tmp;
+                            File tmp;
+                            tmp.setName(cmd[1]);
+                            tmp.setSize(std::stoi(cmd[0]));
+                            *fsptr += tmp;
                         }
                     }
                     ls = true;
                 }
             }
         }
+        int sum = findAtMostTenThousand(root);
+        std::cout << sum << "\n";
     }
     return 0;
 }
